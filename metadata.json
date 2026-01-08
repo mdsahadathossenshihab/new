@@ -1,0 +1,5 @@
+{
+  "name": "ZenBlog Admin Dash",
+  "description": "A high-performance, production-grade admin dashboard for a blog system featuring a Zen-mode TipTap editor and advanced analytics.",
+  "requestFramePermissions": []
+}
