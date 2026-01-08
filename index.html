@@ -10,7 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body, html { font-family: 'Inter', sans-serif; height: 100%; margin: 0; padding: 0; }
+    #root { min-height: 100%; display: flex; flex-direction: column; }
+    
     .tiptap p.is-editor-empty:first-child::before {
       content: attr(data-placeholder);
       float: left;
@@ -50,7 +52,9 @@
 }
 </script>
 </head>
-<body class="h-full overflow-hidden">
-  <div id="root" class="h-full"></div>
+<body class="h-full bg-slate-50">
+  <div id="root"></div>
+  <!-- This line is required to run the application code -->
+  <script type="module" src="./index.tsx"></script>
 </body>
 </html>

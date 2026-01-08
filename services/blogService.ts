@@ -1,15 +1,15 @@
 
 import { Blog, DashboardStats, BlogStatus } from '../types';
 
-const STORAGE_KEY = 'zenblog_local_data';
+const STORAGE_KEY = 'zenblog_local_storage_v1';
 
-// Initial Mock Data to prevent empty screen on first load
+// Initial Mock Data
 const INITIAL_DATA: Blog[] = [
   {
     id: '1',
     title: 'স্বাগতম ZenBlog এ',
     slug: 'welcome-to-zenblog',
-    content: 'এটি একটি ডেমো ব্লগ। আপনি এডমিন প্যানেল থেকে এটি ডিলিট করে আপনার নিজের ব্লগ লিখতে পারেন।',
+    content: 'এটি আপনার প্রথম ব্লগ পোস্ট। এডমিন প্যানেল থেকে আপনি এটি পরিবর্তন বা ডিলিট করতে পারবেন।',
     category: 'Technology',
     status: 'published',
     created_at: new Date().toISOString(),
@@ -18,22 +18,33 @@ const INITIAL_DATA: Blog[] = [
 ];
 
 const getStoredBlogs = (): Blog[] => {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (!data) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DATA));
+  if (typeof window === 'undefined') return INITIAL_DATA;
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DATA));
+      return INITIAL_DATA;
+    }
+    return JSON.parse(data);
+  } catch (e) {
+    console.error("Local Storage Error:", e);
     return INITIAL_DATA;
   }
-  return JSON.parse(data);
 };
 
 const saveStoredBlogs = (blogs: Blog[]) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(blogs));
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(blogs));
+  } catch (e) {
+    console.error("Storage Save Error:", e);
+  }
 };
 
 export const blogService = {
   async getBlogs(): Promise<Blog[]> {
     return new Promise((resolve) => {
-      setTimeout(() => resolve(getStoredBlogs()), 300); // Simulate network delay
+      setTimeout(() => resolve(getStoredBlogs()), 100);
     });
   },
 
@@ -46,10 +57,10 @@ export const blogService = {
     const blogs = getStoredBlogs();
     const newBlog: Blog = {
       id: Math.random().toString(36).substr(2, 9),
-      title: blogData.title || 'Untitled',
-      slug: blogData.slug || 'untitled',
+      title: blogData.title || 'Untitled Story',
+      slug: blogData.slug || 'untitled-' + Date.now(),
       content: blogData.content || '',
-      category: blogData.category || 'General',
+      category: blogData.category || 'Lifestyle',
       status: blogData.status || 'draft',
       created_at: new Date().toISOString(),
       seo_meta: blogData.seo_meta || { description: '', keywords: '' }
