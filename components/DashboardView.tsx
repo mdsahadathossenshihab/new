@@ -1,12 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
-  Plus, Search, Filter, MoreVertical, Edit2, Eye, Trash2, 
-  FileText, CheckCircle, AlertCircle, TrendingUp, ChevronLeft, 
-  ChevronRight, ExternalLink, Send
+  Plus, Search, TrendingUp, FileText, CheckCircle, AlertCircle, 
+  Edit2, Trash2, Send, Database, Globe, Cloud
 } from 'lucide-react';
 import { blogService } from '../services/blogService';
-import { Blog, DashboardStats, BlogStatus } from '../types';
+import { Blog, DashboardStats } from '../types';
 import { Card, CardContent } from './ui/Card';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
@@ -18,14 +16,17 @@ interface DashboardViewProps {
   onCreate: () => void;
 }
 
+// Added React to imports above to fix the 'Cannot find namespace React' error here
 export const DashboardView: React.FC<DashboardViewProps> = ({ onEdit, onCreate }) => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<string>('all');
+  const [storageMode, setStorageMode] = useState<'cloud' | 'local'>('local');
 
   useEffect(() => {
+    setStorageMode(blogService.getStorageMode());
     loadData();
   }, []);
 
@@ -76,6 +77,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onEdit, onCreate }
 
   return (
     <div className="max-w-7xl mx-auto px-10 py-12 space-y-10 overflow-y-auto h-full pb-32 custom-scrollbar">
+      {/* Storage Status Bar */}
+      <div className="flex items-center justify-between bg-white px-6 py-3 rounded-2xl border border-slate-100 shadow-sm mb-4">
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "w-2 h-2 rounded-full animate-pulse",
+            storageMode === 'cloud' ? "bg-emerald-500" : "bg-amber-500"
+          )} />
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            Storage Status: 
+            <span className={cn("ml-2", storageMode === 'cloud' ? "text-emerald-600" : "text-amber-600")}>
+              {storageMode === 'cloud' ? 'Connected to MongoDB Cloud' : 'Disconnected (Using Local Browser Storage)'}
+            </span>
+          </span>
+        </div>
+        {storageMode === 'local' && (
+          <p className="text-[9px] text-slate-400 italic">
+            Note: Add MONGODB_API_URL and MONGODB_API_KEY in Vercel settings to enable Cloud mode.
+          </p>
+        )}
+      </div>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>
